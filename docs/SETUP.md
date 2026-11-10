@@ -131,11 +131,14 @@ password: keep them only in `.env` or `espn_cookies.json`, and on Linux/macOS ru
 | Whole daily pipeline, dry run | `python -m fh_companion.daily` |
 | Whole daily pipeline, live | `python -m fh_companion.daily run` |
 | Draft-day board (offline) | `python -m fh_companion.draft_helper rankings.csv` |
+| Read-only HTML report page | `python -m fh_companion.report` |
+| Test the report (fake data, no network) | `python -m tests.test_report` |
 
 Output goes to `data/`: `analysis.json`, `roster.csv`, `fa.csv`, `lineup_*_report.json`, `set_lineups.log`,
 and `data/logs/daily_YYYYMMDD.log` + `data/logs/LAST_STATUS` for the daily runner.
 
-There is **no URL or port** to open; results are files and terminal output. Open the CSVs in any spreadsheet app.
+There is **no URL or port** to open; results are files and terminal output. Open the CSVs in any spreadsheet app,
+and open `data/report/index.html` (from `fh_companion.report`) in any browser.
 
 ## 6. Schedule it daily (optional)
 

@@ -10,6 +10,8 @@ with Python 3 (a Raspberry Pi works well) and:
 - **Writes lineup moves only.** Every write goes through a guard that refuses anything other than a lineup-slot
   move between players already on your roster: no adds, drops, waiver claims, trades, or IR moves.
 - Includes a **daily cron script** with locking, logs and a one-line status file, plus an offline **draft-day helper**.
+- Writes a **read-only HTML report** (`python -m fh_companion.report`): daily-run status, pending waiver claims,
+  adds left this week, IR health, and each player's recent form next to ESPN's projection.
 
 > **Unofficial tool.** This project is not affiliated with, endorsed by, or supported by ESPN or The Walt Disney Company.
 > It uses undocumented endpoints that can change or break at any time. You are responsible for complying with ESPN's
@@ -31,7 +33,8 @@ python -m fh_companion.pull_espn && python -m fh_companion.analyze
 python -m fh_companion.set_lineups                     # preview moves (no writes)
 ```
 
-This is a command-line tool: there is no web UI, URL or port. Results are written to `data/`.
+This is a command-line tool: there is no web UI, URL or port. Results are written to `data/`, including a static
+HTML report page (`data/report/index.html`) you can open in any browser.
 
 ## Requirements
 
@@ -64,9 +67,14 @@ cp .env.example .env                    # optional; env vars override config.jso
 | `force_start` | Player full names allowed to start even while ESPN still tags them injured |
 | `goalie_scoring` | Your league's goalie points (used to recalculate goalie points in `analyze`) |
 | `data_dir` / `cookies_file` | Where pulls/logs and the cookie file live (relative to the repo root) |
+| `status_file` / `log_dir` | Report only: the daily run's `LAST_STATUS` and `daily_*.log` folder (default `data/logs/`) |
+| `analysis_file` | Report only: `analysis.json` used for NHL team abbreviations (default `data/analysis.json`) |
+| `report_out` | Report only: output page (default `data/report/index.html`) |
+| `adds_limit` | Report only: adds per matchup week; `null` derives it from league settings (fallback 4) |
+| `stale_hours` | Report only: daily status older than this shows as stale (default 26) |
 
 Environment overrides: `FH_LEAGUE_ID`, `FH_TEAM_ID`, `FH_SEASON`, `FH_SEASON_START`, `FH_DATA_DIR`,
-`FH_CONFIG`, `ESPN_COOKIES_FILE`, `ESPN_S2`, `ESPN_SWID`.
+`FH_CONFIG`, `ESPN_COOKIES_FILE`, `ESPN_S2`, `ESPN_SWID`, `FH_STATUS_FILE`, `FH_LOG_DIR`, `FH_REPORT_OUT`.
 
 ### Authentication
 
@@ -89,7 +97,9 @@ python3 -m fh_companion.analyze            # -> data/analysis.json, data/roster.
 python3 -m fh_companion.set_lineups        # plan (read-only, prints the moves it would make)
 python3 -m fh_companion.set_lineups run    # WRITES lineup changes to ESPN
 python3 -m fh_companion.set_lineups verify # re-reads lineups and reports mismatches
+python3 -m fh_companion.report             # read-only HTML report -> data/report/index.html
 python3 -m tests.test_guard                # proves the write guard blocks non-lineup payloads (no network)
+python3 -m tests.test_report               # report tests on fake fixtures (no network)
 ```
 
 Daily automation (any OS: `python -m fh_companion.daily [run]`; Linux shell version below):
@@ -103,6 +113,32 @@ scripts/daily_lineups.sh run      # live
 
 Logs go to `data/logs/daily_YYYYMMDD.log` (30 days kept). `data/logs/LAST_STATUS` holds a one-line status:
 `OK`, `FAIL AUTH`, `FAIL GUARD` or `FAIL`.
+
+### Report page (read-only)
+
+`python -m fh_companion.report` writes one self-contained HTML page (no JavaScript, no external assets) with:
+
+1. **Daily lineup run**: time, OK/FAIL, scoring period, days set and failures, parsed from `LAST_STATUS`, plus the
+   tail of the latest `daily_*.log`. Shown red when the run failed, the status is missing, or it is older than
+   `stale_hours` (26 h).
+2. **Pending moves & IR**: pending waiver claims and add/drops (with when they process), adds used/left this matchup
+   week, and IR players with their injury status. A red banner appears when a healthy (not OUT / INJURY_RESERVE /
+   SUSPENSION) player sits in an IR slot, because ESPN blocks every add until that is fixed and the daily job never
+   makes IR moves.
+3. **Recent form**: last-7 and last-15 day points per game (league scoring, same conventions as `analyze`) next to
+   ESPN's projected points per game, with a trend column.
+
+It makes three or four GET requests to ESPN's read API (`mStatus`/`mSettings`/`mRoster`/`mTeam`, `mTransactions2`,
+and a player lookup for claim targets). The module does not import the write helpers, and its HTTP wrapper has no
+method that can POST. Options: `--out PATH`, `--json PATH` (model as JSON), `--fixture snapshot.json` (render offline),
+`--save-snapshot PATH`, `--wait-for-today MIN` (wait for today's `LAST_STATUS` first).
+
+To refresh it after the daily run, add a separate cron line (it waits up to 40 minutes for that day's status, runs
+at low priority with a timeout, and never touches the lineup job):
+
+```bash
+# 20 9 * * * /path/to/fantasy-hockey-companion/scripts/report_after_daily.sh
+```
 
 Draft day (offline, no login): copy `examples/rankings.example.csv` to `rankings.csv`, fill in your rankings, then
 run `python3 -m fh_companion.draft_helper` and use `take <name>`, `undo <name>`, `next [C|LW|RW|D|G]`, `board`, `quit`.

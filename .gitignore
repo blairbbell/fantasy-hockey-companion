@@ -22,6 +22,12 @@ fa.csv
 taken.txt
 rankings.csv
 LAST_STATUS
+# Generated report pages and private snapshots
+report/
+index.html
+*snapshot*.json
+!tests/fixtures/report_snapshot.json
+.report.lock
 *.png
 *.pdf
 

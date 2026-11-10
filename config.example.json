@@ -9,5 +9,17 @@
   "bench_slots": 6,
   "never_start": [],
   "force_start": [],
-  "goalie_scoring": {"W": 4, "GA": -1, "SV": 0.2, "SO": 1, "OTL": 1}
+  "goalie_scoring": {
+    "W": 4,
+    "GA": -1,
+    "SV": 0.2,
+    "SO": 1,
+    "OTL": 1
+  },
+  "status_file": "",
+  "log_dir": "",
+  "analysis_file": "",
+  "report_out": "",
+  "adds_limit": null,
+  "stale_hours": 26
 }

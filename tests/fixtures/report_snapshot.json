@@ -1,0 +1,382 @@
+{
+ "fetched": "2030-01-08T06:00:00-05:00",
+ "season": 2027,
+ "scoringPeriodId": 43,
+ "currentMatchupPeriod": 7,
+ "matchupPeriods": {
+  "7": [
+   43,
+   44,
+   45,
+   46,
+   47,
+   48,
+   49
+  ]
+ },
+ "acquisitionSettings": {
+  "matchupAcquisitionLimit": 0.5714285714285714,
+  "matchupLimitPerScoringPeriod": true
+ },
+ "team": {
+  "id": 1,
+  "name": "Sample Team",
+  "waiverRank": 5,
+  "transactionCounter": {
+   "matchupAcquisitionTotals": {
+    "6": 4,
+    "7": 1
+   }
+  },
+  "entries": [
+   {
+    "playerId": 9001,
+    "lineupSlotId": 0,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9001,
+     "fullName": "Sample Center One",
+     "eligibleSlots": [
+      0,
+      6,
+      7
+     ],
+     "proTeamId": 99,
+     "injured": false,
+     "injuryStatus": "ACTIVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 9.0,
+       "stats": {
+        "34": 3
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 18.9,
+       "stats": {
+        "34": 7
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 45.0,
+       "stats": {
+        "34": 18
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 205.0,
+       "stats": {
+        "34": 82
+       }
+      }
+     ]
+    }
+   },
+   {
+    "playerId": 9002,
+    "lineupSlotId": 1,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9002,
+     "fullName": "Sample Wing Two",
+     "eligibleSlots": [
+      1,
+      6,
+      7
+     ],
+     "proTeamId": 99,
+     "injured": false,
+     "injuryStatus": "ACTIVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 3.0,
+       "stats": {
+        "34": 3
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 7.0,
+       "stats": {
+        "34": 7
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 45.0,
+       "stats": {
+        "34": 18
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 205.0,
+       "stats": {
+        "34": 82
+       }
+      }
+     ]
+    }
+   },
+   {
+    "playerId": 9003,
+    "lineupSlotId": 4,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9003,
+     "fullName": "Sample Defense Three",
+     "eligibleSlots": [
+      4,
+      6,
+      7
+     ],
+     "proTeamId": 99,
+     "injured": false,
+     "injuryStatus": "ACTIVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 16.0,
+       "stats": {
+        "34": 4
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 30.0,
+       "stats": {
+        "34": 8
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 45.0,
+       "stats": {
+        "34": 18
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 205.0,
+       "stats": {
+        "34": 82
+       }
+      }
+     ]
+    }
+   },
+   {
+    "playerId": 9004,
+    "lineupSlotId": 5,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9004,
+     "fullName": "Sample Goalie Four",
+     "eligibleSlots": [
+      5,
+      7
+     ],
+     "proTeamId": 98,
+     "injured": false,
+     "injuryStatus": "ACTIVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 0,
+       "stats": {
+        "0": 2,
+        "1": 1,
+        "4": 5,
+        "6": 50,
+        "7": 0,
+        "9": 1
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 0,
+       "stats": {
+        "0": 5,
+        "1": 3,
+        "4": 11,
+        "6": 130,
+        "7": 1,
+        "9": 1
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 0,
+       "stats": {
+        "0": 12,
+        "1": 7,
+        "4": 30,
+        "6": 300,
+        "7": 1,
+        "9": 2
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 0,
+       "stats": {
+        "0": 60,
+        "1": 32,
+        "4": 150,
+        "6": 1500,
+        "7": 4,
+        "9": 7
+       }
+      }
+     ]
+    }
+   },
+   {
+    "playerId": 9005,
+    "lineupSlotId": 7,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9005,
+     "fullName": "Sample Bench Five",
+     "eligibleSlots": [
+      0,
+      6,
+      7
+     ],
+     "proTeamId": 99,
+     "injured": false,
+     "injuryStatus": "ACTIVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 0,
+       "stats": {
+        "34": 0
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 3.0,
+       "stats": {
+        "34": 2
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 45.0,
+       "stats": {
+        "34": 18
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 205.0,
+       "stats": {
+        "34": 82
+       }
+      }
+     ]
+    }
+   },
+   {
+    "playerId": 9006,
+    "lineupSlotId": 8,
+    "injuryStatus": "NORMAL",
+    "player": {
+     "id": 9006,
+     "fullName": "Sample Injured Six",
+     "eligibleSlots": [
+      0,
+      6,
+      7
+     ],
+     "proTeamId": 99,
+     "injured": true,
+     "injuryStatus": "INJURY_RESERVE",
+     "stats": [
+      {
+       "id": "012027",
+       "appliedTotal": 0,
+       "stats": {
+        "34": 0
+       }
+      },
+      {
+       "id": "022027",
+       "appliedTotal": 0,
+       "stats": {
+        "34": 0
+       }
+      },
+      {
+       "id": "002027",
+       "appliedTotal": 45.0,
+       "stats": {
+        "34": 18
+       }
+      },
+      {
+       "id": "102027",
+       "appliedTotal": 205.0,
+       "stats": {
+        "34": 82
+       }
+      }
+     ]
+    }
+   }
+  ]
+ },
+ "transactions": [
+  {
+   "type": "WAIVER",
+   "status": "PENDING",
+   "isPending": true,
+   "teamId": 1,
+   "proposedDate": 1894307532565,
+   "processDate": null,
+   "items": [
+    {
+     "type": "ADD",
+     "playerId": 9100
+    },
+    {
+     "type": "DROP",
+     "playerId": 9002
+    }
+   ]
+  },
+  {
+   "type": "FREEAGENT",
+   "status": "EXECUTED",
+   "isPending": false,
+   "teamId": 1,
+   "items": [
+    {
+     "type": "ADD",
+     "playerId": 9101
+    }
+   ]
+  }
+ ],
+ "players": {
+  "9100": {
+   "name": "Sample Waiver Claim",
+   "status": "WAIVERS",
+   "waiverProcessDate": 1894352400000
+  }
+ },
+ "abbrevs": {
+  "9001": "AAA",
+  "9002": "BBB",
+  "9003": "CCC",
+  "9004": "DDD",
+  "9005": "EEE",
+  "9006": "FFF"
+ }
+}

@@ -28,6 +28,13 @@ DEFAULTS = {
     "force_start": [],          # player full names to start even if ESPN tags them injured
     # League scoring used for the goalie points recalculation in analyze.py
     "goalie_scoring": {"W": 4, "GA": -1, "SV": 0.2, "SO": 1, "OTL": 1},
+    # Read-only HTML report (python -m fh_companion.report). Empty paths = defaults under data_dir.
+    "status_file": "",          # LAST_STATUS written by the daily run (default data_dir/logs/LAST_STATUS)
+    "log_dir": "",              # where daily_YYYYMMDD.log files live (default data_dir/logs)
+    "analysis_file": "",        # analysis.json from analyze (used only for NHL team abbreviations)
+    "report_out": "",           # output page (default data_dir/report/index.html)
+    "adds_limit": None,         # adds per matchup week; None = derive from league settings (fallback 4)
+    "stale_hours": 26,          # daily status older than this is shown as stale
 }
 
 ENV_MAP = {
@@ -37,6 +44,9 @@ ENV_MAP = {
     "FH_SEASON_START": ("season_start", str),
     "FH_DATA_DIR": ("data_dir", str),
     "ESPN_COOKIES_FILE": ("cookies_file", str),
+    "FH_STATUS_FILE": ("status_file", str),
+    "FH_LOG_DIR": ("log_dir", str),
+    "FH_REPORT_OUT": ("report_out", str),
 }
 
 
@@ -64,6 +74,10 @@ def load() -> dict:
     for key in ("data_dir", "cookies_file"):
         p = Path(cfg[key]).expanduser()
         cfg[key] = p if p.is_absolute() else ROOT / p
+    for key, default in (("status_file", "logs/LAST_STATUS"), ("log_dir", "logs"),
+                         ("analysis_file", "analysis.json"), ("report_out", "report/index.html")):
+        p = Path(cfg.get(key) or default).expanduser()
+        cfg[key] = p if p.is_absolute() else (cfg["data_dir"] / p if not cfg.get(key) else ROOT / p)
     cfg["lineup_slots"] = {int(k): int(v) for k, v in cfg["lineup_slots"].items()}
     return cfg
 

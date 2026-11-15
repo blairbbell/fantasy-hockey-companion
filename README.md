@@ -7,6 +7,10 @@ with Python 3 (a Raspberry Pi works well) and:
 - **Analyzes** roster and free-agent value under your league's scoring and writes `roster.csv`, `fa.csv`, `analysis.json`.
 - **Optimizes daily lineups** for the rest of the season (Hungarian assignment over your lineup slots),
   never starting players tagged OUT / INJURY_RESERVE / SUSPENSION, and respecting games already locked.
+  It uses every player's full position eligibility, so a multi-position bench player gets in when shifting
+  starters between slots makes room (e.g. a C/LW on the bench takes LW while the LW/RW starter slides to an RW slot
+  whose player has no game). An independent exchange audit confirms no such shuffle was missed, and each shift is
+  logged as `dual-eligibility shift: ...`.
 - **Writes lineup moves only.** Every write goes through a guard that refuses anything other than a lineup-slot
   move between players already on your roster: no adds, drops, waiver claims, trades, or IR moves.
 - Includes a **daily cron script** with locking, logs and a one-line status file, plus an offline **draft-day helper**.
@@ -29,6 +33,7 @@ pip install -r requirements.txt
 cp config.example.json config.json                     # Windows: Copy-Item config.example.json config.json
 cp .env.example .env                                   # then fill in league/team ids and ESPN cookies
 python -m tests.test_guard                             # offline self-test
+python -m tests.test_lineup_opt                        # offline lineup optimizer tests
 python -m fh_companion.pull_espn && python -m fh_companion.analyze
 python -m fh_companion.set_lineups                     # preview moves (no writes)
 ```
@@ -61,7 +66,7 @@ cp .env.example .env                    # optional; env vars override config.jso
 | `team_id` | Your team's id in that league (`teamId` in your team page URL) |
 | `season` | ESPN `seasonId`, the year the season ends (2026-27 season = `2027`) |
 | `season_start` | Date of scoring period 1, used only for date labels |
-| `lineup_slots` | Active slot counts by ESPN slot id: `0`=C `1`=LW `2`=RW `4`=D `5`=G `6`=UTIL. Match your league settings. |
+| `lineup_slots` | Active slot counts by ESPN slot id: `0`=C `1`=LW `2`=RW `4`=D `5`=G `6`=UTIL. Fallback only: lineups read the counts from your league's settings when ESPN returns them. |
 | `bench_slots` | Bench size |
 | `never_start` | Player full names to always bench (unless on IR) |
 | `force_start` | Player full names allowed to start even while ESPN still tags them injured |

@@ -1,0 +1,16 @@
+{
+ "_comment": "Fake players only. Slot ids: 0=C 1=LW 2=RW 4=D 5=G 6=UTIL 7=BN. Scenario: Sample Bench CLW (C/LW, has a game) sits while the RW slot holds a player with no game; shifting Sample Wing LR from LW to RW makes room.",
+ "slot_counts": {"0": 1, "1": 1, "2": 1, "4": 1, "5": 1, "6": 1},
+ "bench_n": 4,
+ "players": [
+  {"id": 101, "name": "Sample Center", "slot": 0, "elig": [0, 6, 7], "has": true, "w": 3.0},
+  {"id": 102, "name": "Sample Wing LR", "slot": 1, "elig": [1, 2, 6, 7], "has": true, "w": 2.5},
+  {"id": 103, "name": "Sample Idle RW", "slot": 2, "elig": [2, 6, 7], "has": false, "w": 4.0},
+  {"id": 104, "name": "Sample Defense", "slot": 4, "elig": [4, 6, 7], "has": true, "w": 1.5},
+  {"id": 105, "name": "Sample Goalie", "slot": 5, "elig": [5, 7], "has": true, "w": 3.2},
+  {"id": 106, "name": "Sample Util", "slot": 6, "elig": [0, 6, 7], "has": true, "w": 2.8},
+  {"id": 107, "name": "Sample Bench CLW", "slot": 7, "elig": [0, 1, 6, 7], "has": true, "w": 2.0},
+  {"id": 108, "name": "Sample Bench Injured", "slot": 7, "elig": [2, 6, 7], "has": true, "w": 9.0, "forced": true}
+ ],
+ "expected": {"101": 0, "102": 2, "103": 7, "104": 4, "105": 5, "106": 6, "107": 1, "108": 7}
+}

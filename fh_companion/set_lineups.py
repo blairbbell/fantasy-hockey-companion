@@ -3,6 +3,8 @@ LINEUP MOVES ONLY (ROSTER / FUTURE_ROSTER LINEUP items). No adds/drops/claims/tr
 Modes:  plan [from] [to]   (DEFAULT - read-only, prints moves)
         run  [from] [to]   (WRITES lineup changes to ESPN)
         verify [spid,spid,...]     (default: latest..final)
+Slots: max-weight assignment over each player's full eligibleSlots (lineup_opt.py), so a multi-position bench
+       player starts whenever shifting starters between slots makes room; an exchange audit proves optimality.
 Rules: players with injuryStatus OUT / INJURY_RESERVE / SUSPENSION (or injured=True) are never put in active slots;
        names in config `never_start` are always benched (unless on IR); names in `force_start` are allowed to start
        even when ESPN still tags them injured.
@@ -12,10 +14,11 @@ from datetime import date, timedelta, datetime
 import json, sys, time
 from .config import CFG
 from .espn_common import DATA, TEAM, STAT_SEASON, STAT_PROJ, STAT_LAST_YEAR, session, league, pro_schedule, post_tx
+from . import lineup_opt  # pure slot optimizer + dual-eligibility shift audit
 
 SLOTS = CFG["lineup_slots"]   # {slot id: count}; C=0 LW=1 RW=2 D=4 G=5 UTIL=6
 BENCH, IR, BENCH_N = 7, 8, CFG["bench_slots"]
-SLOTNAME = {0: "C", 1: "LW", 2: "RW", 4: "D", 5: "G", 6: "UTIL", 7: "BN", 8: "IR"}
+SLOTNAME = {0: "C", 1: "LW", 2: "RW", 3: "F", 4: "D", 5: "G", 6: "UTIL", 7: "BN", 8: "IR"}
 NO_START = {"OUT", "INJURY_RESERVE", "SUSPENSION"}
 NEVER_START = set(CFG["never_start"])
 FORCE_START = set(CFG["force_start"])
@@ -29,31 +32,6 @@ def log(m):
     with LOG.open("a", encoding="utf-8") as f: f.write(m + "\n")
 
 def spid_date(s): return (SEASON_START + timedelta(days=s - 1)).isoformat()
-
-def hungarian(a):
-    n, m = len(a), len(a[0])
-    u=[0]*(n+1); v=[0]*(m+1); p=[0]*(m+1); way=[0]*(m+1)
-    for i in range(1, n+1):
-        p[0]=i; j0=0; minv=[float('inf')]*(m+1); used=[False]*(m+1)
-        while True:
-            used[j0]=True; i0=p[j0]; delta=float('inf'); j1=0
-            for j in range(1, m+1):
-                if not used[j]:
-                    cur=a[i0-1][j-1]-u[i0]-v[j]
-                    if cur<minv[j]: minv[j]=cur; way[j]=j0
-                    if minv[j]<delta: delta=minv[j]; j1=j
-            for j in range(m+1):
-                if used[j]: u[p[j]]+=delta; v[j]-=delta
-                else: minv[j]-=delta
-            j0=j1
-            if p[j0]==0: break
-        while True:
-            j1=way[j0]; p[j0]=p[j1]; j0=j1
-            if j0==0: break
-    ans=[None]*n
-    for j in range(1, m+1):
-        if p[j]: ans[p[j]-1]=j-1
-    return ans
 
 def roster(s, spid):
     j = league(s, ["mRoster", "mStatus"], scoringPeriodId=spid, _=int(time.time()*1000))
@@ -73,7 +51,7 @@ def schedule(s):
         out[str(t["id"])] = {"abbrev": t["abbrev"], "games": {sp: [g["date"] for g in gs] for sp, gs in (t.get("proGamesByScoringPeriod") or {}).items()}}
     return out
 
-def is_goalie(p): return 5 in p["elig"] and not any(s in p["elig"] for s in (0,1,2,4))
+is_goalie = lineup_opt.is_goalie
 def unavailable(p): return p["inj"] in NO_START or p["injured"]
 
 def value(p):
@@ -93,12 +71,22 @@ def value(p):
     if n and cur is not None: base = (base*20 + cur*n)/(20+n)
     return round(base, 3), {"proj_pg": proj and round(proj,2), "ly_pg": ly and round(ly,2), "cur_pg": cur and round(cur,2), "gp": n}
 
-def optimize(players, spid, sched, vals, now_ms, latest):
+def league_slots(s):
+    """Active lineup slot counts from your league's settings (fallback: config `lineup_slots` / `bench_slots`)."""
+    try:
+        j = league(s, ["mSettings"])
+        c = {int(k): v for k, v in j["settings"]["rosterSettings"]["lineupSlotCounts"].items()}
+        act = {k: v for k, v in c.items() if k not in (BENCH, IR) and v > 0}
+        return (act or dict(SLOTS)), c.get(BENCH, BENCH_N)
+    except Exception as e:
+        log(f"  slot counts from league settings failed ({e}); using config {SLOTS}")
+        return dict(SLOTS), BENCH_N
+
+
+def optimize(players, spid, sched, vals, now_ms, latest, slots=None, bench_n=BENCH_N):
+    """Desired slot per non-IR player for one scoring period (see lineup_opt.assign)."""
     movable = [p for p in players if p["slot"] != IR]
-    inst = []
-    for sl, c in SLOTS.items(): inst += [sl]*c
-    inst += [BENCH]*max(BENCH_N, len(movable))      # bench unlimited
-    info, rows = {}, []
+    info = {}
     for p in movable:
         games = sched.get(str(p["pro"]), {}).get("games", {}).get(str(spid), [])
         has = bool(games)
@@ -106,21 +94,12 @@ def optimize(players, spid, sched, vals, now_ms, latest):
         forced = (p["name"] in NEVER_START or unavailable(p)) and p["name"] not in FORCE_START
         w = vals.get(p["id"], 0.0) if has else 0.0
         info[p["id"]] = dict(has=has, locked=locked, forced=forced, w=w)
-        row = []
-        for sl in inst:
-            stay = 1 if p["slot"] == sl else 0
-            if locked and p["slot"] != sl: row.append(BIG); continue
-            if sl == BENCH: row.append(-stay); continue
-            if sl not in p["elig"] or (forced and not locked): row.append(BIG); continue
-            if sl == 5 and not is_goalie(p): row.append(BIG); continue
-            row.append(-(w*1000) - stay)
-        rows.append(row)
-    if len(rows) > len(inst): raise RuntimeError(f"rows {len(rows)} > slots {len(inst)}")
-    asg = hungarian(rows); desired = {}
-    for i, p in enumerate(movable):
-        if rows[i][asg[i]] >= BIG: raise RuntimeError(f"infeasible for {p['name']} spid {spid}")
-        desired[p["id"]] = inst[asg[i]]
+    try:
+        desired = lineup_opt.assign(movable, info, slots or SLOTS, bench_n)
+    except RuntimeError as e:
+        raise RuntimeError(f"{e} spid {spid}")
     return desired, info
+
 
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "plan"
@@ -128,6 +107,7 @@ def main():
     s = session()
     boot = roster(s, 0); latest, final = boot["latest"], boot["final"]
     sched = schedule(s)
+    slots, bench_n = league_slots(s)
     players0 = roster(s, latest)["players"]
     vals, vinfo = {}, {}
     for p in players0: vals[p["id"]], vinfo[p["name"]] = value(p)
@@ -153,7 +133,7 @@ def main():
             res = None; sit = []; diff = []
             for attempt in range(4):
                 pl = roster(s, spid)["players"]
-                desired, info = optimize(pl, spid, sched, vals, now_ms, latest)
+                desired, info = optimize(pl, spid, sched, vals, now_ms, latest, slots, bench_n)
                 diff = [p for p in pl if p["slot"] != IR and desired[p["id"]] != p["slot"] and not info[p["id"]]["locked"]]
                 if attempt == 0:
                     desired_store[str(spid)] = {str(k): v for k, v in desired.items()}
@@ -163,7 +143,10 @@ def main():
                 if mode in ("plan", "verify"):
                     if mode == "plan":
                         log(f"  [{spid}] moves: " + "; ".join(f"{p['name']} {SLOTNAME[p['slot']]}->{SLOTNAME[desired[p['id']]]}" for p in diff))
+                        for c in lineup_opt.shift_chains([p for p in pl if p["slot"] != IR], desired, slotname=SLOTNAME): log(f"  [{spid}] {c}")
                     res = "planned" if mode == "plan" else "mismatch"; break
+                if attempt == 0:
+                    for c in lineup_opt.shift_chains([p for p in pl if p["slot"] != IR], desired, slotname=SLOTNAME): log(f"  [{spid}] {c}")
                 items = sorted([{"playerId": p["id"], "type": "LINEUP", "fromLineupSlotId": p["slot"], "toLineupSlotId": desired[p["id"]]} for p in diff],
                                key=lambda it: 0 if it["toLineupSlotId"] == BENCH else 1)
                 payload = {"isLeagueManager": False, "teamId": TEAM, "type": tx, "scoringPeriodId": spid, "executionType": "EXECUTE", "items": items}

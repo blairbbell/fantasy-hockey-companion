@@ -104,6 +104,7 @@ python3 -m fh_companion --help             # list commands (--version for the pa
 python3 -m fh_companion pull_espn          # same as python3 -m fh_companion.pull_espn
 python3 -m fh_companion.pull_espn          # read-only pull -> data/pull_latest_raw.json
 python3 -m fh_companion.analyze            # -> data/analysis.json, data/roster.csv, data/fa.csv
+python3 -m fh_companion.analyze --out-dir DIR   # write those three files to DIR instead
 python3 -m fh_companion.set_lineups        # plan (read-only, prints the moves it would make)
 python3 -m fh_companion.set_lineups run    # WRITES lineup changes to ESPN
 python3 -m fh_companion.set_lineups verify # re-reads lineups and reports mismatches
@@ -111,6 +112,9 @@ python3 -m fh_companion.report             # read-only HTML report -> data/repor
 python3 -m tests.test_guard                # proves the write guard blocks non-lineup payloads (no network)
 python3 -m tests.test_report               # report tests on fake fixtures (no network)
 ```
+
+`analyze` exits with a clear message if the pull file is missing, is not valid JSON, or does not look
+like a pull (no traceback).
 
 Daily automation (any OS: `python -m fh_companion.daily [run]`; Linux shell version below):
 

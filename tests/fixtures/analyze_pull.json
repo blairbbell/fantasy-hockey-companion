@@ -1,0 +1,338 @@
+{
+ "league": {
+  "ok": true,
+  "status": 200,
+  "j": {
+   "scoringPeriodId": 40,
+   "status": {
+    "currentMatchupPeriod": 8
+   },
+   "settings": {
+    "name": "Sample League",
+    "scheduleSettings": {
+     "matchupPeriods": {
+      "8": [
+       40,
+       41,
+       42,
+       43,
+       44,
+       45,
+       46
+      ]
+     }
+    },
+    "scoringSettings": {
+     "scoringItems": [
+      {
+       "statId": 13,
+       "points": 3
+      }
+     ]
+    }
+   },
+   "teams": [
+    {
+     "id": 1,
+     "roster": {
+      "entries": [
+       {
+        "lineupSlotId": 0,
+        "playerPoolEntry": {
+         "player": {
+          "id": 101,
+          "fullName": "Sample Center",
+          "eligibleSlots": [
+           0,
+           6,
+           7
+          ],
+          "proTeamId": 1,
+          "injuryStatus": "ACTIVE",
+          "ownership": {
+           "percentOwned": 12.3
+          },
+          "stats": [
+           {
+            "id": "002027",
+            "appliedTotal": 30,
+            "stats": {
+             "34": 10,
+             "13": 3,
+             "14": 4,
+             "16": 7,
+             "38": 2,
+             "29": 20,
+             "31": 10,
+             "32": 8,
+             "27": 1080
+            }
+           },
+           {
+            "id": "012027",
+            "appliedTotal": 8,
+            "stats": {
+             "34": 3,
+             "13": 3,
+             "14": 4,
+             "16": 7,
+             "38": 2,
+             "29": 20,
+             "31": 10,
+             "32": 8,
+             "27": 1080
+            }
+           },
+           {
+            "id": "102027",
+            "appliedTotal": 200,
+            "stats": {
+             "34": 80,
+             "13": 3,
+             "14": 4,
+             "16": 7,
+             "38": 2,
+             "29": 20,
+             "31": 10,
+             "32": 8,
+             "27": 1080
+            }
+           },
+           {
+            "id": "002026",
+            "appliedTotal": 150,
+            "stats": {
+             "34": 70,
+             "13": 3,
+             "14": 4,
+             "16": 7,
+             "38": 2,
+             "29": 20,
+             "31": 10,
+             "32": 8,
+             "27": 1080
+            }
+           }
+          ]
+         },
+         "status": "ONTEAM",
+         "onTeamId": 1
+        }
+       },
+       {
+        "lineupSlotId": 5,
+        "playerPoolEntry": {
+         "player": {
+          "id": 201,
+          "fullName": "Sample Goalie",
+          "eligibleSlots": [
+           5,
+           7
+          ],
+          "proTeamId": 2,
+          "injuryStatus": "ACTIVE",
+          "ownership": {
+           "percentOwned": 12.3
+          },
+          "stats": [
+           {
+            "id": "002027",
+            "appliedTotal": 16,
+            "stats": {
+             "0": 8,
+             "1": 2,
+             "2": 1,
+             "4": 8,
+             "6": 80,
+             "7": 1,
+             "9": 1,
+             "10": 2.5,
+             "11": 0.91
+            }
+           },
+           {
+            "id": "012027",
+            "appliedTotal": 4,
+            "stats": {
+             "0": 3,
+             "1": 2,
+             "2": 1,
+             "4": 8,
+             "6": 80,
+             "7": 1,
+             "9": 1,
+             "10": 2.5,
+             "11": 0.91
+            }
+           },
+           {
+            "id": "102027",
+            "appliedTotal": 80,
+            "stats": {
+             "0": 50,
+             "1": 2,
+             "2": 1,
+             "4": 8,
+             "6": 80,
+             "7": 1,
+             "9": 1,
+             "10": 2.5,
+             "11": 0.91
+            }
+           },
+           {
+            "id": "002026",
+            "appliedTotal": 70,
+            "stats": {
+             "0": 40,
+             "1": 2,
+             "2": 1,
+             "4": 8,
+             "6": 80,
+             "7": 1,
+             "9": 1,
+             "10": 2.5,
+             "11": 0.91
+            }
+           }
+          ]
+         },
+         "status": "ONTEAM",
+         "onTeamId": 1
+        }
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "pro": {
+  "settings": {
+   "proTeams": [
+    {
+     "id": 1,
+     "abbrev": "SAM",
+     "proGamesByScoringPeriod": {
+      "39": [
+       {
+        "date": 1
+       }
+      ],
+      "40": [
+       {
+        "date": 2
+       }
+      ],
+      "41": [
+       {
+        "date": 3
+       }
+      ]
+     }
+    },
+    {
+     "id": 2,
+     "abbrev": "EXA",
+     "proGamesByScoringPeriod": {
+      "40": [
+       {
+        "date": 2
+       }
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "fa": {
+  "byOwn": {
+   "ok": true,
+   "status": 200,
+   "j": {
+    "players": [
+     {
+      "player": {
+       "id": 301,
+       "fullName": "Sample Free Agent",
+       "eligibleSlots": [
+        4,
+        6,
+        7
+       ],
+       "proTeamId": 1,
+       "injuryStatus": "ACTIVE",
+       "ownership": {
+        "percentOwned": 12.3
+       },
+       "stats": [
+        {
+         "id": "002027",
+         "appliedTotal": 18,
+         "stats": {
+          "34": 9,
+          "13": 3,
+          "14": 4,
+          "16": 7,
+          "38": 2,
+          "29": 20,
+          "31": 10,
+          "32": 8,
+          "27": 1080
+         }
+        },
+        {
+         "id": "012027",
+         "appliedTotal": 5,
+         "stats": {
+          "34": 3,
+          "13": 3,
+          "14": 4,
+          "16": 7,
+          "38": 2,
+          "29": 20,
+          "31": 10,
+          "32": 8,
+          "27": 1080
+         }
+        },
+        {
+         "id": "102027",
+         "appliedTotal": 90,
+         "stats": {
+          "34": 80,
+          "13": 3,
+          "14": 4,
+          "16": 7,
+          "38": 2,
+          "29": 20,
+          "31": 10,
+          "32": 8,
+          "27": 1080
+         }
+        },
+        {
+         "id": "002026",
+         "appliedTotal": 80,
+         "stats": {
+          "34": 70,
+          "13": 3,
+          "14": 4,
+          "16": 7,
+          "38": 2,
+          "29": 20,
+          "31": 10,
+          "32": 8,
+          "27": 1080
+         }
+        }
+       ]
+      },
+      "status": "FREEAGENT",
+      "onTeamId": 0
+     }
+    ]
+   }
+  }
+ }
+}

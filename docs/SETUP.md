@@ -127,7 +127,7 @@ password: keep them only in `.env` or `espn_cookies.json`, and on Linux/macOS ru
 | List commands / version | `python -m fh_companion --help` (or `--version`) |
 | Test the write guard (no network, no cookies) | `python -m tests.test_guard` |
 | Pull league data (read-only) | `python -m fh_companion.pull_espn` |
-| Analyze roster and free agents | `python -m fh_companion.analyze` |
+| Analyze roster and free agents | `python -m fh_companion.analyze` (optional `--out-dir DIR`) |
 | Preview lineup moves (no writes) | `python -m fh_companion.set_lineups` |
 | Apply lineup moves on ESPN | `python -m fh_companion.set_lineups run` |
 | Check lineups after a run | `python -m fh_companion.set_lineups verify` |

@@ -134,6 +134,7 @@ password: keep them only in `.env` or `espn_cookies.json`, and on Linux/macOS ru
 | Whole daily pipeline, dry run | `python -m fh_companion.daily` |
 | Whole daily pipeline, live | `python -m fh_companion.daily run` |
 | Draft-day board (offline) | `python -m fh_companion.draft_helper rankings.csv` |
+| Draft-day, non-interactive | `python -m fh_companion.draft_helper --take "Name"` / `--board` / `--next D` |
 | Read-only HTML report page | `python -m fh_companion.report` |
 | Test the report (fake data, no network) | `python -m tests.test_report` |
 

@@ -152,6 +152,8 @@ at low priority with a timeout, and never touches the lineup job):
 
 Draft day (offline, no login): copy `examples/rankings.example.csv` to `rankings.csv`, fill in your rankings, then
 run `python3 -m fh_companion.draft_helper` and use `take <name>`, `undo <name>`, `next [C|LW|RW|D|G]`, `board`, `quit`.
+The same actions work non-interactively: `--take NAME`, `--undo NAME`, `--next [POS]`, `--board`
+(and `--count N`, `--taken-file PATH`).
 
 ## How the lineup optimizer values players
 

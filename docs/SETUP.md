@@ -112,6 +112,8 @@ Copy the examples:
 | `espn_s2`, `SWID` cookies | See below | `.env` (`ESPN_S2`, `ESPN_SWID`) **or** `espn_cookies.json` |
 
 Optional: `never_start` / `force_start` (lists of player full names), `season_start`, `data_dir`.
+A broken `config.json` (invalid JSON or a value of the wrong type) fails with a clear error;
+unknown keys are ignored with a warning.
 
 **Getting the ESPN cookies:** log in at https://fantasy.espn.com in a desktop browser, open DevTools
 (F12 / Cmd+Opt+I) → **Application** (Chrome/Edge) or **Storage** (Firefox) → **Cookies** → `https://www.espn.com`,

@@ -81,6 +81,8 @@ cp .env.example .env                    # optional; env vars override config.jso
 
 Environment overrides: `FH_LEAGUE_ID`, `FH_TEAM_ID`, `FH_SEASON`, `FH_SEASON_START`, `FH_DATA_DIR`,
 `FH_CONFIG`, `ESPN_COOKIES_FILE`, `ESPN_S2`, `ESPN_SWID`, `FH_STATUS_FILE`, `FH_LOG_DIR`, `FH_REPORT_OUT`.
+Invalid JSON and mistyped values in `config.json` (or a bad env override) fail with a clear error;
+unknown keys are ignored with a warning.
 
 ### Authentication
 

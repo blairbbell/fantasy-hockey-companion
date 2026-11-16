@@ -8,8 +8,10 @@ Settings come from (later wins):
 Nothing personal is hard-coded here. Copy config.example.json -> config.json and .env.example -> .env.
 """
 from __future__ import annotations
+
 import json
 import os
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,6 +39,14 @@ DEFAULTS = {
     "stale_hours": 26,          # daily status older than this is shown as stale
 }
 
+INT_KEYS = {"league_id", "team_id", "season", "bench_slots", "stale_hours"}
+STR_KEYS = {
+    "season_start", "data_dir", "cookies_file", "status_file",
+    "log_dir", "analysis_file", "report_out",
+}
+LIST_KEYS = {"never_start", "force_start"}
+DICT_KEYS = {"lineup_slots", "goalie_scoring"}
+
 ENV_MAP = {
     "FH_LEAGUE_ID": ("league_id", int),
     "FH_TEAM_ID": ("team_id", int),
@@ -50,8 +60,13 @@ ENV_MAP = {
 }
 
 
-def _load_dotenv(path: Path) -> None:
+class ConfigError(SystemExit):
+    """Raised (as SystemExit) when config.json or an env override cannot be used."""
+
+
+def _load_dotenv(path: Path, environ: dict | None = None) -> None:
     """Minimal .env reader (KEY=VALUE lines); does not override real env vars."""
+    env = os.environ if environ is None else environ
     if not path.exists():
         return
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -59,26 +74,88 @@ def _load_dotenv(path: Path) -> None:
         if not line or line.startswith("#") or "=" not in line:
             continue
         k, v = line.split("=", 1)
-        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+        env.setdefault(k.strip(), v.strip().strip('"').strip("'"))
 
 
-def load() -> dict:
-    _load_dotenv(ROOT / ".env")
+def _coerce(key, value, path: str):
+    """Return value coerced to the type expected for key, or raise ConfigError."""
+    if key in INT_KEYS:
+        if isinstance(value, bool) or not isinstance(value, (int, str)):
+            raise ConfigError(f"{path}: {key} must be an integer, got {type(value).__name__}")
+        try:
+            return int(value)
+        except (TypeError, ValueError) as e:
+            raise ConfigError(f"{path}: {key} must be an integer, got {value!r}") from e
+    if key == "adds_limit":
+        if value is None or value == "":
+            return None
+        if isinstance(value, bool) or not isinstance(value, (int, str)):
+            raise ConfigError(f"{path}: adds_limit must be an integer or null")
+        try:
+            return int(value)
+        except (TypeError, ValueError) as e:
+            raise ConfigError(f"{path}: adds_limit must be an integer or null, got {value!r}") from e
+    if key in STR_KEYS:
+        if not isinstance(value, str):
+            raise ConfigError(f"{path}: {key} must be a string")
+        return value
+    if key in LIST_KEYS:
+        if not isinstance(value, list) or not all(isinstance(x, str) for x in value):
+            raise ConfigError(f"{path}: {key} must be a list of strings")
+        return value
+    if key in DICT_KEYS:
+        if not isinstance(value, dict):
+            raise ConfigError(f"{path}: {key} must be an object")
+        return value
+    return value
+
+
+def _apply_file(cfg: dict, raw, path: Path) -> None:
+    if not isinstance(raw, dict):
+        raise ConfigError(f"{path} must contain a JSON object")
+    unknown = sorted(set(raw) - set(DEFAULTS))
+    if unknown:
+        print(f"WARNING: unknown keys in {path} ignored: {unknown}", file=sys.stderr)
+    for key, value in raw.items():
+        if key not in DEFAULTS:
+            continue
+        cfg[key] = _coerce(key, value, str(path))
+
+
+def load(root: Path | None = None, environ: dict | None = None) -> dict:
+    """Load config. `root` defaults to the repo root; `environ` defaults to os.environ.
+
+    When `environ` is passed, a .env file next to `root` is applied onto that mapping
+    (without overriding keys already present) and FH_* lookups use it instead of os.environ.
+    """
+    root = ROOT if root is None else Path(root)
+    env = os.environ if environ is None else environ
+    _load_dotenv(root / ".env", env)
     cfg = json.loads(json.dumps(DEFAULTS))
-    cfg_path = Path(os.environ.get("FH_CONFIG", ROOT / "config.json"))
+    cfg_path = Path(env.get("FH_CONFIG", root / "config.json"))
     if cfg_path.exists():
-        cfg.update(json.loads(cfg_path.read_text(encoding="utf-8")))
-    for env, (key, typ) in ENV_MAP.items():
-        if os.environ.get(env):
-            cfg[key] = typ(os.environ[env])
+        try:
+            raw = json.loads(cfg_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            raise ConfigError(f"Invalid JSON in {cfg_path}: {e}") from e
+        _apply_file(cfg, raw, cfg_path)
+    for name, (key, typ) in ENV_MAP.items():
+        if env.get(name):
+            try:
+                cfg[key] = typ(env[name])
+            except (TypeError, ValueError) as e:
+                raise ConfigError(f"Environment variable {name} must be a {typ.__name__}, got {env[name]!r}") from e
     for key in ("data_dir", "cookies_file"):
         p = Path(cfg[key]).expanduser()
-        cfg[key] = p if p.is_absolute() else ROOT / p
+        cfg[key] = p if p.is_absolute() else root / p
     for key, default in (("status_file", "logs/LAST_STATUS"), ("log_dir", "logs"),
                          ("analysis_file", "analysis.json"), ("report_out", "report/index.html")):
         p = Path(cfg.get(key) or default).expanduser()
-        cfg[key] = p if p.is_absolute() else (cfg["data_dir"] / p if not cfg.get(key) else ROOT / p)
-    cfg["lineup_slots"] = {int(k): int(v) for k, v in cfg["lineup_slots"].items()}
+        cfg[key] = p if p.is_absolute() else (cfg["data_dir"] / p if not cfg.get(key) else root / p)
+    try:
+        cfg["lineup_slots"] = {int(k): int(v) for k, v in cfg["lineup_slots"].items()}
+    except (TypeError, ValueError) as e:
+        raise ConfigError(f"lineup_slots must map slot ids to integer counts: {e}") from e
     return cfg
 
 

@@ -32,6 +32,7 @@ python3 -m venv .venv && source .venv/bin/activate     # Windows: py -m venv .ve
 pip install -r requirements.txt
 cp config.example.json config.json                     # Windows: Copy-Item config.example.json config.json
 cp .env.example .env                                   # then fill in league/team ids and ESPN cookies
+python -m fh_companion --help                          # list commands
 python -m tests.test_guard                             # offline self-test
 python -m tests.test_lineup_opt                        # offline lineup optimizer tests
 python -m fh_companion.pull_espn && python -m fh_companion.analyze
@@ -97,6 +98,8 @@ you log out or change your password; the tools report "cookies expired" on HTTP 
 ## Usage
 
 ```bash
+python3 -m fh_companion --help             # list commands (--version for the package version)
+python3 -m fh_companion pull_espn          # same as python3 -m fh_companion.pull_espn
 python3 -m fh_companion.pull_espn          # read-only pull -> data/pull_latest_raw.json
 python3 -m fh_companion.analyze            # -> data/analysis.json, data/roster.csv, data/fa.csv
 python3 -m fh_companion.set_lineups        # plan (read-only, prints the moves it would make)

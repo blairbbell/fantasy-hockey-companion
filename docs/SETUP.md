@@ -122,6 +122,7 @@ password: keep them only in `.env` or `espn_cookies.json`, and on Linux/macOS ru
 
 | Task | Command |
 | --- | --- |
+| List commands / version | `python -m fh_companion --help` (or `--version`) |
 | Test the write guard (no network, no cookies) | `python -m tests.test_guard` |
 | Pull league data (read-only) | `python -m fh_companion.pull_espn` |
 | Analyze roster and free agents | `python -m fh_companion.analyze` |
